@@ -1,9 +1,18 @@
 from fastapi import FastAPI  # importa o FastAPI
 from rotas import clientes
+from fastapi.middleware.cors import CORSMiddleware  # importa o middleware de CORS
 
 app = FastAPI()              # cria a aplicação
 
 app.include_router(clientes.router)     # registra as rotas de clientes na API
+
+# Configura quais origens têm permissão de chamar a API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # "*" = qualquer origem (usado em desenvolvimento)
+    allow_methods=["*"],      # permite todos os métodos (GET, POST, PUT, DELETE)
+    allow_headers=["*"],      # permite todos os cabeçalhos
+)
 
 
 @app.get("/")                # define que essa função responde ao endereço "/"
