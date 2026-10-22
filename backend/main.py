@@ -1,20 +1,44 @@
-from fastapi import FastAPI  # importa o FastAPI
-from rotas import clientes
-from fastapi.middleware.cors import CORSMiddleware  # importa o middleware de CORS
 
-app = FastAPI()              # cria a aplicação
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from rotas import clientes, senioridade, tatuadores, agendamentos, estilos
+import os
 
-app.include_router(clientes.router)     # registra as rotas de clientes na API
+app = FastAPI()
 
-# Configura quais origens têm permissão de chamar a API
+# Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # "*" = qualquer origem (usado em desenvolvimento)
-    allow_methods=["*"],      # permite todos os métodos (GET, POST, PUT, DELETE)
-    allow_headers=["*"],      # permite todos os cabeçalhos
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
+# Cria a pasta de uploads caso não exista
+os.makedirs("uploads", exist_ok=True)
 
-@app.get("/")                # define que essa função responde ao endereço "/"
-def inicio():                # quando alguém acessar "/", essa função vai rodar
-    return {"mensagem": "API do estúdio de tatuagem funcionando!"}
+# Disponibiliza as imagens enviadas
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads"
+)
+
+# Registra as rotas da API
+app.include_router(clientes.router)
+app.include_router(senioridade.router)
+app.include_router(tatuadores.router)
+app.include_router(agendamentos.router)
+
+
+# Rota inicial
+@app.get("/")
+def inicio():
+    return {
+        "mensagem": "API do estúdio de tatuagem funcionando!"
+    }
+
+    from rotas import clientes, senioridade, tatuadores, agendamentos, estilos   # ← adiciona estilos aqui
+...
+app.include_router(estilos.router)   # ← registra a nova rota
